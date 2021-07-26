@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_auth/register_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -27,6 +32,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -48,6 +55,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  //get valu dari controller
+  final emailText = TextEditingController();
+  final passwordText = TextEditingController();
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -57,6 +68,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -97,10 +113,11 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.only(left: 24, right: 24),
               child: TextField(
                 decoration: InputDecoration(
-                    labelText: "Enter Your Username",
+                    labelText: "Enter Your Email",
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 8)),
                 style: TextStyle(fontSize: 20),
+                controller: emailText,
               ),
             ),
             SizedBox(
@@ -114,6 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 8)),
                 style: TextStyle(fontSize: 20),
+                controller: passwordText,
               ),
             ),
             SizedBox(
@@ -126,11 +144,32 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: ElevatedButton.styleFrom(
                       textStyle: TextStyle(fontSize: 18),
                       minimumSize: Size(double.infinity, 45)),
-                  onPressed: () {}),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(content: Text(emailText.text));
+                        });
+                  }),
+            ),
+            SizedBox(height: 8),
+            InkWell(
+              onTap: () {
+                doToRegisterPage(context);
+              },
+              child: Text(
+                "Register",
+                style: TextStyle(color: Colors.blue),
+              ),
             )
           ],
         ),
       ),
     );
+  }
+
+  void doToRegisterPage(BuildContext ctx) {
+    Navigator.of(ctx).push(MaterialPageRoute(
+        builder: (ctx) => RegisterPage(title: "Register Auth")));
   }
 }
