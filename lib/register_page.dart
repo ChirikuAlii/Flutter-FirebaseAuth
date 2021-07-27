@@ -59,7 +59,7 @@ class _RegisterPage extends State<RegisterPage> {
                         textStyle: TextStyle(fontSize: 18),
                         minimumSize: Size(double.infinity, 45)),
                     onPressed: () async {
-                      await doRegister();
+                      await doRegister(context);
                     }),
               ),
             ],
@@ -67,22 +67,37 @@ class _RegisterPage extends State<RegisterPage> {
         ));
   }
 
-  Future<void> doRegister() async {
-    final User? user = (await _auth.createUserWithEmailAndPassword(
-      email: emailText.text,
-      password: passwordText.text,
-    ))
-        .user;
-    if (user != null) {
-      setState(() {
-        success = true;
-      });
-      print("do register success $success");
-    } else {
-      setState(() {
-        success = false;
-      });
-      print("do register failed $success");
+  Future<void> doRegister(BuildContext context) async {
+    try {
+      final User? user = (await _auth.createUserWithEmailAndPassword(
+        email: emailText.text,
+        password: passwordText.text,
+      ))
+          .user;
+      if (user != null) {
+        setState(() {
+          success = true;
+        });
+        context.showToast("success register");
+        print("do register success $success");
+      } else {
+        setState(() {
+          success = false;
+        });
+        context.showToast("failed register");
+        print("do register failed $success");
+      }
+    } catch (e) {
+      context.showToast("failed register $e");
     }
+  }
+}
+
+extension CustomToast on BuildContext {
+  void showToast(String message) {
+    final scaffold = ScaffoldMessenger.of(this);
+    scaffold.showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
   }
 }

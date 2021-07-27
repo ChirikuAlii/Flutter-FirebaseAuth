@@ -145,11 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       textStyle: TextStyle(fontSize: 18),
                       minimumSize: Size(double.infinity, 45)),
                   onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(content: Text(emailText.text));
-                        });
+                    doLogin(context);
                   }),
             ),
             SizedBox(height: 8),
@@ -171,5 +167,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void doToRegisterPage(BuildContext ctx) {
     Navigator.of(ctx).push(MaterialPageRoute(
         builder: (ctx) => RegisterPage(title: "Register Auth")));
+  }
+
+  Future<void> doLogin(BuildContext ctx) async {
+    try {
+      final User? user = (await _auth.signInWithEmailAndPassword(
+        email: emailText.text,
+        password: passwordText.text,
+      ))
+          .user;
+
+      ctx.showToast("success login ${user?.email}");
+    } catch (e) {
+      ctx.showToast("failed login ${e}");
+    }
   }
 }
